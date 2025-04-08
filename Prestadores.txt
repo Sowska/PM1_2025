@@ -1,0 +1,30 @@
+11000000
+Juan Pérez
+Plomería
+Calle Falsa 123
+juanp@gmail.com
+123-456-789
+60000000
+Ana Gómez
+Electricidad
+Av. Siempre Viva 456
+ana.g@gmail.com
+987-654-321
+50000000
+Carlos López
+Jardinería
+Av. Libertador 789
+carlosl@gmail.com
+321-654-987
+40000000
+Lucía Martínez
+Pintura
+Calle Roja 234
+luciam@gmail.com
+654-321-987
+80000000
+Miguel Torres
+Cerrajería
+Calle Azul 567
+miguelt@gmail.com
+789-123-456
