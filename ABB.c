@@ -14,7 +14,7 @@ typedef struct Nodo
 
 NodoArbol *crearNodo(Prestador prestador)
 {
-    Nodo *nuevo = (Nodo *)malloc(sizeof(Nodo));
+    NodoArbol *nuevo = (NodoArbol *)malloc(sizeof(NodoArbol));
     if (nuevo != NULL)
     {
         nuevo->prestador = prestador;
@@ -124,9 +124,9 @@ int altaABB(Arbol *arbol, Prestador x, float *costo)
 int altaABBMem(Arbol *arbol, Prestador x)
 {
 
-    int costo = 0;
+    float costo = 0.0;
 
-    if (localizarABB(arbol, x.dni, costo))
+    if (localizarABB(arbol, x.dni, &costo))
     {
         return 0;
     }
@@ -156,129 +156,102 @@ int altaABBMem(Arbol *arbol, Prestador x)
 
 int bajaABBConfirmada(int dni, Arbol *arbol)
 {
-
     NodoArbol *auxi, *elem;
-    int costoloc = 0;
+    float costoloc = 0.0;
     int opcion = 0;
+
     if (arbol->raiz == NULL)
-    {
-        return 2; // Arbol vacio
-    }
+        return 2; // Árbol vacío
+
     if (!localizarABB(arbol, dni, &costoloc))
-    {
-        return 0; // El elemento no existe
-    }
+        return 0; // Elemento no existe
+
     do
     {
         printf("El prestador a eliminar es:\n");
-        imprimirPrestador(arbol->pos->prestador);
-        printf("¿Esta seguro que desea eliminarlo?\n");
-        printf("1. Si\n");
+        mostrarPrestador(arbol->pos->prestador);
+        printf("¿Está seguro que desea eliminarlo?\n");
+        printf("1. Sí\n");
         printf("2. No\n");
-        printf("Seleccione una opcion: ");
+        printf("Seleccione una opción: ");
         scanf("%d", &opcion);
-
     } while (opcion != 1 && opcion != 2);
 
-    switch (opcion)
+    if (opcion == 2)
+        return 3; // Cancelado por el usuario
+
+    // opcion == 1 -> continuar con baja
+    if (arbol->pos->izq == NULL && arbol->pos->der == NULL)
     {
-    case 1:
-        // Caso 1: Nodo hoja - sin hijos
-        if (arbol->pos->der == NULL && arbol->pos->izq == NULL)
+        // Caso 1: Nodo hoja
+        if (arbol->pos == arbol->raiz)
         {
-            if (arbol->pos == arbol->raiz)
-            {
-                arbol->raiz = NULL;
-                free(arbol->pos);
-                arbol->pos = NULL;
-            }
-            else
-            {
-                if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
-                {
-                    arbol->padre->izq = NULL;
-                }
-                else
-                {
-                    arbol->padre->der = NULL;
-                }
-                free(arbol->pos);
-                arbol->pos = NULL;
-            }
+            arbol->raiz = NULL;
         }
-        // Caso 2: Nodo con un solo hijo
-        else if (arbol->pos->der == NULL || arbol->pos->izq == NULL)
-        {
-            auxi = (arbol->pos->izq != NULL) ? arbol->pos->izq : arbol->pos->der;
-            if (arbol->pos == arbol->raiz)
-            {
-                arbol->raiz = auxi;
-            }
-            else
-            {
-                if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
-                {
-                    arbol->padre->izq = auxi;
-                }
-                else
-                {
-                    arbol->padre->der = auxi;
-                }
-            }
-            free(arbol->pos);
-            arbol->pos = NULL;
-        }
-        // Caso 3: Nodo con dos hijos
         else
         {
-            elem = arbol->pos->der;
-            arbol->padre = arbol->pos;
-            NodoArbol *ant_aux = NULL;
-
-            while (elem->izq != NULL) // Esto busca el minimo del subarbol derecho (nueva politica de reemplazo).
-            {
-                ant_aux = elem;
-                elem = elem->izq;
-            }
-            arbol->pos->prestador = elem->prestador;
-
-            if (ant_aux == NULL)
-            {
-
-                // El hijo derecho es el minimo entonces
-                arbol->pos->der = elem->der;
-            }
+            if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
+                arbol->padre->izq = NULL;
             else
-            {
-                // El minimo tiene hijo derecho
-                ant_aux->izq = elem->der;
-            }
-
-            free(elem);
-            elem = NULL;
+                arbol->padre->der = NULL;
         }
-        return 1;
-
-        break;
-
-    case 2:
-
-        return 3;
-
-        break;
-
-    default:
-
-        printf("Error inesperado en la baja\n");
-        break;
+        free(arbol->pos);
+        arbol->pos = NULL;
     }
+    else if (arbol->pos->izq == NULL || arbol->pos->der == NULL)
+    {
+        // Caso 2: Nodo con un hijo
+        auxi = (arbol->pos->izq != NULL) ? arbol->pos->izq : arbol->pos->der;
+        if (arbol->pos == arbol->raiz)
+        {
+            arbol->raiz = auxi;
+        }
+        else
+        {
+            if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
+                arbol->padre->izq = auxi;
+            else
+                arbol->padre->der = auxi;
+        }
+        free(arbol->pos);
+        arbol->pos = NULL;
+    }
+    else
+    {
+        // Caso 3: Nodo con dos hijos
+        elem = arbol->pos->der;
+        NodoArbol *ant_aux = NULL;
+        arbol->padre = arbol->pos;
+
+        while (elem->izq != NULL)
+        {
+            ant_aux = elem;
+            elem = elem->izq;
+        }
+
+        arbol->pos->prestador = elem->prestador;
+
+        if (ant_aux == NULL)
+        {
+            // El hijo derecho era el min
+            arbol->pos->der = elem->der;
+        }
+        else
+        {
+            ant_aux->izq = elem->der;
+        }
+
+        free(elem);
+    }
+
+    return 1; // Baja realizada
 }
 
 int bajaABBAutomatica(Arbol *arbol, Prestador x, float *costo)
 {
     NodoArbol *auxi, *elem;
     (*costo) = 0.0;
-    int costoloc = 0;
+    float costoloc = 0.0;
 
     if (arbol->raiz == NULL)
     {
@@ -383,7 +356,7 @@ int bajaABBAutomatica(Arbol *arbol, Prestador x, float *costo)
 Prestador evocarABB(Arbol *arbol, int x, float *costo)
 {
     (*costo) = 0.0;
-    int costoloc = 0;
+    float costoloc = 0.0;
     Prestador p;
 
     int result = localizarABB(arbol, x, &costoloc);
@@ -416,7 +389,7 @@ void mostrarEstructuraABB(NodoArbol *raiz)
     {
         NodoArbol *actual = stack[top--];
 
-        imprimirPrestador(actual->prestador);
+        mostrarPrestador(actual->prestador);
 
         if (actual->izq != NULL)
         {

@@ -21,12 +21,13 @@ void freeNodo(NodoArbol *nodo);
 void vaciarArbol(Arbol *arbol);
 int localizarABB(Arbol *arbol, int dni, float *costo);
 int altaABB(Arbol *arbol, Prestador x, float *costo);
+int altaABBMem(Arbol *arbol, Prestador x);
 int bajaABBConfirmada(int dni, Arbol *arbol);
 int bajaABBAutomatica(Arbol *arbol, Prestador x, float *costo);
 Prestador evocarABB(Arbol *arbol, int x, float *costo);
 void mostrarEstructuraABB(NodoArbol *raiz);
 void initArbol(Arbol *arbol);
 int memorizacionPreviaABB(Arbol *arbol);
-int modificarABB(int dni, Arbol* arbol);
+void modificarABB(int dni, Arbol* arbol);
 
 #endif

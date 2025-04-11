@@ -5,7 +5,9 @@
         "abb.h": "c",
         "resultloc.h": "c",
         "string.h": "c",
-        "prestador.h": "c"
+        "prestador.h": "c",
+        "libb.h": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

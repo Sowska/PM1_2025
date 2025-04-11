@@ -22,10 +22,14 @@ typedef struct
 
 typedef struct
 {
-    int total[4]; // 0.Alta - 1. Baja - 2.Evocar exitoso - 3. Evocar fallido
-    int max[4];
+    float total[4]; // 0.Alta - 1. Baja - 2.Evocar exitoso - 3. Evocar fallido
+    float max[4];
     float med[4];
     int cant[4];
 } CostosLIBB;
+
+void mostrarCostosLIBB(CostosLIBB costos);
+void mostrarCostosLVO(CostosLVO costos);
+void mostrarCostosABB(CostosABB costos);
 
 #endif

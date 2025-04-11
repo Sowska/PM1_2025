@@ -12,5 +12,10 @@ typedef struct {
 int sonDiferentes(Prestador p1, Prestador p2);
 void mostrarPrestador(Prestador p);
 void limpiarPantalla();
+void modificar_nombre(Prestador* p);
+void modificar_servicio(Prestador* p);
+void modificar_domicilio(Prestador* p);
+void modificar_email(Prestador* p);
+void modificar_telefono(Prestador* p);
 
 #endif

@@ -4,6 +4,8 @@
 #include "Resultloc.h"
 #include "Constantes.h"
 
+
+
 typedef struct NodoLista
 {
     Prestador prestador;
@@ -12,12 +14,18 @@ typedef struct NodoLista
 
 typedef struct
 {
+    int exito;
+    NodoLista *pos; // Si exito == 1 entonces retorna nodo que contiene el dni que localice
+    NodoLista *pre; // Si exito == 0 retorna nodo anterior a la posicion de insercion
+} resultLocLVO;
+
+typedef struct
+{
     NodoLista *head;
     int size;
 } LVO;
 
 void inicializarLista(LVO *lista);
-void mostrarPrestador(Prestador p);
 resultLocLVO localizarLVO(LVO lista, int dni, int *costo);
 int altaLVOMem(Prestador prestador, LVO *lista);
 int altaLVO(Prestador prestador, LVO *lista, float *costo);
@@ -28,5 +36,6 @@ Prestador evocarLVO(LVO lista, int dni, int *costo);
 void mostrarLista(LVO lista);
 void liberarLista(LVO *lista);
 int memorizacionPrevia(LVO *lista);
+
 
 #endif
