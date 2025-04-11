@@ -46,10 +46,14 @@ int main()
             limpiarPantalla();
             printf("Usted selecciono: COMPARACION DE ESTRUCTURAS\n\n");
 
-            compararEstructuras(&libb, &lvo, &arbol);
+            compararEstructuras(&libb, &lvo, &arbol, &costosABB, &costosLVO, &costosLIBB);
+            printf("Comparacion de estructuras finalizada.\n");
+
             break;
         case 2:
-            administrarEstructura();
+            limpiarPantalla();
+            printf("Usted selecciono: ADMINISTRAR ESTRUCTURAS\n\n");
+            administrarEstructura(&arbol, &lvo, &libb);
             break;
         case 3:
             printf("Saliendo del programa...\n");
@@ -73,7 +77,7 @@ cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosABB *costosAB
     {
         return 3; // archivo no encontrado
     }
- 
+
     fseek(fp, 0, SEEK_END);
 
     if (ftell(fp) == 0)
@@ -131,23 +135,21 @@ cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosABB *costosAB
                 (*cantidadLSOBB)++;
             }
 
-                // Procesar alta en LVO
-                result = altaLVO(LSO, aux, *cantidadLSO, costoAltaLSO);
+            // Procesar alta en LVO
+            result = altaLVO(LSO, aux, *cantidadLSO, costoAltaLSO);
 
-                if (costosLSO->max[0] < *costoAltaLSO)
-                {
-                    costosLSO->max[0] = *costoAltaLSO;
-                }
-                if (result)
-                {
-                    costosLSO->total[0] += *costoAltaLSO;
-                    costosLSO->cant[0]++;
-                    (*cantidadLSO)++;
-                }
-
+            if (costosLSO->max[0] < *costoAltaLSO)
+            {
+                costosLSO->max[0] = *costoAltaLSO;
+            }
+            if (result)
+            {
+                costosLSO->total[0] += *costoAltaLSO;
+                costosLSO->cant[0]++;
+                (*cantidadLSO)++;
+            }
 
             break;
-
 
         case 2:
 
@@ -306,7 +308,7 @@ void compararEstructuras(LIBB *libb, LVO *lvo, Arbol *arbol, CostosABB *costosAB
         break;
     }
 
-    if (resultCarga==1)
+    if (resultCarga == 1)
     {
 
         mostrarCostosABB(costosABB);
@@ -316,7 +318,7 @@ void compararEstructuras(LIBB *libb, LVO *lvo, Arbol *arbol, CostosABB *costosAB
 }
 
 // Menu de administracion de estructuras
-void administrarEstructura()
+void administrarEstructura(Arbol *arbol, LVO *lvo, LIBB *libb)
 {
     int opcion;
 
@@ -333,10 +335,10 @@ void administrarEstructura()
         switch (opcion)
         {
         case 1:
-            menuListaVinculada();
+            menuListaVinculada(lvo);
             break;
         case 2:
-            menuArbol();
+            menuArbol(arbol);
             break;
         case 3:
             menuListaInvertida();
@@ -351,13 +353,16 @@ void administrarEstructura()
 }
 
 // Menu de opciones para administrar Lista Vinculada
-void menuListaVinculada()
+void menuListaVinculada(LVO *lvo)
 {
     int opcion;
+    Prestador aux;
+    int loc = 0, dni = 0, costonull = 0;
 
     do
     {
-        printf("\n--- LISTA VINCULADA ---\n");
+        limpiarPantalla();
+        printf("\n--- LISTA VINCULADA ORDENADA---\n");
         printf("1. Alta\n");
         printf("2. Baja\n");
         printf("3. Evocar\n");
@@ -371,24 +376,154 @@ void menuListaVinculada()
         switch (opcion)
         {
         case 1:
-            alta();
+
+            limpiarPantalla();
+
+            printf("Usted selecciono: ALTA  \n\n");
+
+            printf("Ingrese el DNI: \n");
+            scanf("%d", &aux.dni);
+            while (aux.dni < MINDNI || aux.dni > INFINITO)
+            {
+                printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+                scanf("%d", &aux.dni);
+            }
+            printf("Ingrese el nombre: \n");
+            scanf(" %[^\n]", aux.nombre);
+            printf("Ingrese el servicio: \n");
+            scanf(" %[^\n]", aux.servicios);
+            printf("Ingrese el domicilio: \n");
+            scanf(" %[^\n]", aux.domicilio);
+            printf("Ingrese el email: \n");
+            scanf(" %[^\n]", aux.email);
+            printf("Ingrese el telefono: \n");
+            scanf(" %[^\n]", aux.telefono);
+            loc = altaLVOMem(aux, lvo);
+
+            switch (loc)
+            {
+            case 0:
+                printf("El prestador ya existe en la lista.\n");
+                break;
+
+            case 1:
+                printf("El prestador fue agregado exitosamente.\n");
+                break;
+
+            case 2:
+                printf("Memoria insuficiente\n");
+                break;
+
+            default:
+                printf("Error inesperado\n");
+                break;
+            }
+
             break;
+
         case 2:
-            baja();
+            limpiarPantalla();
+
+            printf("Usted selecciono: BAJA  \n\n");
+
+            printf("Ingrese el DNI: \n");
+            scanf("%d", &dni);
+            while (dni < MINDNI || dni > INFINITO)
+            {
+                printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+                scanf("%d", &dni);
+            }
+            loc = bajaLVOConfirmada(dni, lvo);
+
+            switch (loc)
+            {
+            case 0:
+                printf("El prestador no existe en la lista.\n");
+                break;
+            case 1:
+                printf("El prestador fue eliminado exitosamente.\n");
+                break;
+            case 2:
+                printf("La lista esta vacia.\n");
+                break;
+
+            case 3:
+                printf("El usuario canceló la operación.\n");
+                break;
+            default:
+                printf("Error inesperado\n");
+                break;
+            }
             break;
         case 3:
-            evocar();
+            limpiarPantalla();
+
+            printf("Usted selecciono: BUSCAR PRESTADOR (Evocar)  \n\n");
+
+            printf("Ingrese el DNI: \n");
+            scanf("%d", &dni);
+            while (dni < MINDNI || dni > INFINITO)
+            {
+                printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+                scanf("%d", &dni);
+            }
+            aux = evocarLVO(*lvo, dni, &costonull);
+
+            if (aux.dni == 0)
+            {
+                printf("El prestador no existe en la lista.\n");
+            }
+            else
+            {
+                printf("El prestador fue encontrado exitosamente.\n");
+                mostrarPrestador(aux);
+            }
             break;
+
         case 4:
-            mostrarEstructura();
+            limpiarPantalla();
+
+            printf("Usted selecciono: MOSTRAR ESTRUCTURA  \n\n");
+            mostrarLista(*lvo);
             break;
         case 5:
-            memorizacionPrevia();
+            limpiarPantalla();
+
+            printf("Usted selecciono: CARGAR DESDE ARCHIVO (Memorizacion Previa) \n\n");
+            loc = memorizacionPrevia(lvo);
+            switch (loc)
+            {
+            case 1:
+                printf("Memorizacion exitosa.\n");
+
+            case 2:
+                printf("El archivo está vacío.\n");
+                break;
+
+            case 3:
+                printf("No se pudo abrir el archivo\n");
+            default:
+                printf("Error inesperado en carga de archivo.\n");
+                break;
+            }
             break;
         case 6:
-            modificar();
+            limpiarPantalla();
+
+            printf("Usted selecciono: MODIFICAR PRESTADOR  \n\n");
+
+            printf("Ingrese el DNI: \n");
+            scanf("%d", &dni);
+            while (dni < MINDNI || dni > INFINITO)
+            {
+                printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+                scanf("%d", &dni);
+            }
+            modificarLVO(dni, lvo);
             break;
+
         case 7:
+            limpiarPantalla();
             printf("Volviendo...\n");
             break;
         default:
@@ -398,12 +533,15 @@ void menuListaVinculada()
 }
 
 // Menu de opciones para administrar arbol Binario
-void menuArbol()
+void menuArbol(Arbol *arbol)
 {
-    int opcion;
+    int opcion, returnAlta, dni, returnBaja,resultMem;
+
+    Prestador aux;
 
     do
     {
+        limpiarPantalla();
         printf("\n--- ÁRBOL BINARIO ---\n");
         printf("1. Alta\n");
         printf("2. Baja\n");
@@ -418,22 +556,137 @@ void menuArbol()
         switch (opcion)
         {
         case 1:
-            alta();
+            limpiarPantalla();
+
+            printf("Usted selecciono: ALTA  \n\n");
+            printf("Ingrese el DNI: \n");
+            scanf("%d", &aux.dni);
+            while (aux.dni < MINDNI || aux.dni > INFINITO)
+            {
+                printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+                scanf("%d", &aux.dni);
+            }
+            printf("Ingrese el nombre: \n");
+            scanf(" %[^\n]", aux.nombre);
+            printf("Ingrese el servicio: \n");
+            scanf(" %[^\n]", aux.servicios);
+            printf("Ingrese el domicilio: \n");
+            scanf(" %[^\n]", aux.domicilio);
+            printf("Ingrese el email: \n");
+            scanf(" %[^\n]", aux.email);
+            printf("Ingrese el telefono: \n");
+            scanf(" %[^\n]", aux.telefono);
+
+            returnAlta = altaABBMem(arbol, aux);
+
+            if (returnAlta)
+            {
+                printf("Carga exitosa.\n");
+            }
+            else
+            {
+                printf("Carga fallida.\n");
+            }
+
             break;
         case 2:
-            baja();
+            limpiarPantalla();
+
+            printf("Usted selecciono: BAJA  \n\n");
+
+            printf("Ingrese el DNI: \n");
+            scanf("%d", &dni);
+            while (dni < MINDNI || dni > INFINITO)
+            {
+                printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+                scanf("%d", &dni);
+            }
+            returnBaja = bajaABBConfirmada(dni, arbol);
+
+            switch (returnBaja)
+            {
+            case 0:
+                printf("El prestador no existe en la lista.\n");
+                break;
+            case 1:
+                printf("El prestador fue eliminado exitosamente.\n");
+                break;
+            case 2:
+                printf("La lista esta vacia.\n");
+                break;
+
+            case 3:
+                printf("El usuario canceló la operación.\n");
+                break;
+            default:
+                printf("Error inesperado\n");
+                break;
+            }
             break;
         case 3:
-            evocar();
+            limpiarPantalla();
+
+            printf("Usted selecciono: BUSCAR PRESTADOR (Evocar)  \n\n");
+            printf("Ingrese el DNI: \n");
+            scanf("%d", &dni);
+            while (dni < MINDNI || dni > INFINITO)
+            {
+                printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+                scanf("%d", &dni);
+            }
+
+            aux = evocarABB(arbol, dni, NULL);
+            if (aux.dni == 0)
+            {
+                printf("El prestador no existe en la lista.\n");
+            }
+            else
+            {
+                printf("El prestador fue encontrado exitosamente.\n");
+                mostrarPrestador(aux);
+            }
             break;
         case 4:
-            mostrarEstructura();
+            limpiarPantalla();
+
+            printf("Usted selecciono: MOSTRAR ESTRUCTURA  \n\n");
+            mostrarEstructuraABB(arbol->raiz);
             break;
         case 5:
-            memorizacionPrevia();
+        limpiarPantalla();
+
+        printf("Usted selecciono: CARGAR DESDE ARCHIVO (Memorizacion Previa) \n\n");
+        resultMem = memorizacionPreviaABB(arbol);
+            switch (resultMem)
+            {
+            case 1:
+                printf("Memorizacion exitosa.\n");
+
+            case 2:
+                printf("El archivo está vacío.\n");
+                break;
+
+            case 3:
+                printf("No se pudo abrir el archivo\n");
+            default:
+                printf("Error inesperado en carga de archivo.\n");
+                break;
+            }
             break;
         case 6:
-            modificar();
+        limpiarPantalla();
+
+        printf("Usted selecciono: MODIFICAR PRESTADOR  \n\n");
+        printf("Ingrese el DNI: \n");
+        scanf("%d", &dni);
+        while (dni < MINDNI || dni > INFINITO)
+        {
+            printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
+            scanf("%d", &dni);
+        }
+
+        modificarABB(dni, arbol);
+
             break;
         case 7:
             printf("Volviendo...\n");
@@ -465,7 +718,8 @@ void menuListaInvertida()
         switch (opcion)
         {
         case 1:
-            altaLIBB() break;
+            altaLIBB();
+            break;
         case 2:
             bajaLIBB();
             break;

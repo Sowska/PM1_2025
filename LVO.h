@@ -16,15 +16,17 @@ typedef struct
     int size;
 } LVO;
 
-void initLVO(LVO *lista);
-resultLocLVO localizarLVO(LVO lista, int dni);
-int altaLVO(Prestador prestador, LVO *lista);
-int bajaLVO(Prestador prestador, LVO *lista);
-int modificarLVO(Prestador prestador, LVO *lista);
-Prestador evocarLVO(LVO lista, int dni);
+void inicializarLista(LVO *lista);
 void mostrarPrestador(Prestador p);
+resultLocLVO localizarLVO(LVO lista, int dni, int *costo);
+int altaLVOMem(Prestador prestador, LVO *lista);
+int altaLVO(Prestador prestador, LVO *lista, float *costo);
+int bajaLVOConfirmada(int dni, LVO *lista);
+int bajaLVOAutomatica(Prestador prestador, LVO *lista, float *costo);
+void modificarLVO(int dni, LVO *lista);
+Prestador evocarLVO(LVO lista, int dni, int *costo);
 void mostrarLista(LVO lista);
 void liberarLista(LVO *lista);
-int memorizacionPreviaLVO(LVO *lista);
+int memorizacionPrevia(LVO *lista);
 
 #endif

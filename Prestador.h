@@ -9,5 +9,8 @@ typedef struct {
     char email[100];
     char telefono[20];
 } Prestador;
+int sonDiferentes(Prestador p1, Prestador p2);
+void mostrarPrestador(Prestador p);
+void limpiarPantalla();
 
 #endif

@@ -9,7 +9,8 @@ typedef struct NodoArbol
     struct NodoArbol *der;
 } NodoArbol;
 
-typedef struct{
+typedef struct
+{
     NodoArbol *raiz;
     NodoArbol *pos;
     NodoArbol *padre;
@@ -19,11 +20,13 @@ NodoArbol *crearNodo(Prestador prestador);
 void freeNodo(NodoArbol *nodo);
 void vaciarArbol(Arbol *arbol);
 int localizarABB(Arbol *arbol, int dni, float *costo);
-int altaABB(Arbol *arbol, Prestador x, float *costo, int cant);
-int bajaABB(Arbol *arbol, Prestador x, float *costo);
-Prestador evocarABB(Arbol *arbol, int x, int *exito, float *costo);
+int altaABB(Arbol *arbol, Prestador x, float *costo);
+int bajaABBConfirmada(int dni, Arbol *arbol);
+int bajaABBAutomatica(Arbol *arbol, Prestador x, float *costo);
+Prestador evocarABB(Arbol *arbol, int x, float *costo);
 void mostrarEstructuraABB(NodoArbol *raiz);
 void initArbol(Arbol *arbol);
-
+int memorizacionPreviaABB(Arbol *arbol);
+int modificarABB(int dni, Arbol* arbol);
 
 #endif

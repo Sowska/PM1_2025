@@ -2,7 +2,10 @@
     "files.associations": {
         "stdlib.h": "c",
         "lvo.h": "c",
-        "abb.h": "c"
+        "abb.h": "c",
+        "resultloc.h": "c",
+        "string.h": "c",
+        "prestador.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }
