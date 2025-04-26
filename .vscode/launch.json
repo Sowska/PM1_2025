@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/losowskisofia/Documentos/Development/EDA 2025/PM1",
+      "program": "/Users/losowskisofia/Documentos/Development/EDA 2025/PM1/build/Debug/outDebug"
+    }
+  ]
+}

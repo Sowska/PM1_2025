@@ -1,12 +1,28 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
-            "type": "cppbuild",
-            "label": "C/C++: clang compilar archivo activo",
-            "command": "/usr/bin/clang",
+            "label": "build",
+            "type": "shell",
+            "command": "gcc",
             "args": [
-                "-fcolor-diagnostics",
-                "-fansi-escape-codes",
+                "-g",
+                "main.c",
+                "-o",
+                "a.out"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Compila el programa C"
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc compilar archivo activo",
+            "command": "/usr/bin/gcc",
+            "args": [
+                "-fdiagnostics-color=always",
                 "-g",
                 "${file}",
                 "-o",
@@ -24,6 +40,5 @@
             },
             "detail": "Tarea generada por el depurador."
         }
-    ],
-    "version": "2.0.0"
+    ]
 }

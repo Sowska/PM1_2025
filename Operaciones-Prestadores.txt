@@ -1,66 +1,55 @@
 1
-22300400
+22
 Julio Argentino Roca
 Mecanico
 BULEVAR ALBERTO OLIVERA 11556
 26798818@server.com
 254-3765438
 1
-22500700
+31
 Julio Roca
 Mecanico2
 BULEVAR 11556
 262228@server.com
 254-3765333
 1
-24586497
+20
 Manuel Quintana
 Pintura
 EULALIO ASTUDILLO 100
 24586497@speedy.com
 384-5722729
 1
-32905820
+28
 Ramon S. Castillo
 Gasista
 PARAGUAY 11087
 32905820@correos.com
 291-6156106
 1
-44075165
-Octavio Becerra
-Programador
-JUAN MANUEL DE ROSAS 1743
-octavio.becerra1b@gmail.com
-2664-031021
+49
+Ana Gómez
+Electricidad
+Av. Siempre Viva 456
+ana.g@gmail.com
+987-654-321
 2
-44075165
-Octavio Becerra
-Programador
-JUAN MANUEL DE ROSAS 1743
-octavio.becerra1b@gmail.com
-2664-031021
-3
-22300400
-3
-44075165
-3
-44600700
-3
-32905820
-1
-44075165
-Octavio Becerra
-Programador
-JUAN MANUEL DE ROSAS 1743
-octavio.becerra1b@gmail.com
-2664-031021
+49
+Ana Gómez
+Electricidad
+Av. Siempre Viva 456
+ana.g@gmail.com
+987-654-321
 2
-44075165
-Octavio Becerr
-Programador
-JUAN MANUEL DE ROSAS 1743
-octavio.becerra1b@gmail.com
-2664-031021
+20
+Manuel Quintana
+Pintura
+EULALIO ASTUDILLO 100
+24586497@speedy.com
+384-5722729
 3
-44075165
+49
+3
+44
+3
+22
