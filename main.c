@@ -11,11 +11,13 @@
 #include "LVO.h"
 #include "ABB.h"
 
+
+
 // Menu de opciones para administrar arbol Binario
 void menuArbol(Arbol *arbol)
 {
-    int opcion, returnAlta, dni, returnBaja, resultMem;
-
+    int opcion=0, resultadoAlta = 0, resultadoBaja = 0, resultadoMem = 0, dni = 0;
+    float costonull = 0.0;
     Prestador aux;
 
     do
@@ -45,27 +47,41 @@ void menuArbol(Arbol *arbol)
                 printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
                 scanf("%d", &aux.dni);
             }
-            printf("Ingrese el nombre: \n");
-            scanf(" %[^\n]", aux.nombre);
-            printf("Ingrese el servicio: \n");
-            scanf(" %[^\n]", aux.servicios);
-            printf("Ingrese el domicilio: \n");
-            scanf(" %[^\n]", aux.domicilio);
-            printf("Ingrese el email: \n");
-            scanf(" %[^\n]", aux.email);
-            printf("Ingrese el telefono: \n");
-            scanf(" %[^\n]", aux.telefono);
+            getchar();
+            printf("Ingrese el nombre:\n");
+            fgets(aux.nombre, sizeof(aux.nombre), stdin);
+            aux.nombre[strcspn(aux.nombre, "\n")] = 0; // Elimino '\n' final
 
-            returnAlta = altaABBMem(arbol, aux);
+            printf("Ingrese el servicio:\n");
+            fgets(aux.servicios, sizeof(aux.servicios), stdin);
+            aux.servicios[strcspn(aux.servicios, "\n")] = 0;
 
-            if (returnAlta)
+            printf("Ingrese el domicilio:\n");
+            fgets(aux.domicilio, sizeof(aux.domicilio), stdin);
+            aux.domicilio[strcspn(aux.domicilio, "\n")] = 0;
+
+            printf("Ingrese el email:\n");
+            fgets(aux.email, sizeof(aux.email), stdin);
+            aux.email[strcspn(aux.email, "\n")] = 0;
+
+            printf("Ingrese el teléfono:\n");
+            fgets(aux.telefono, sizeof(aux.telefono), stdin);
+            aux.telefono[strcspn(aux.telefono, "\n")] = 0;
+
+            resultadoAlta = altaABB(arbol, aux,&costonull);
+
+            if (resultadoAlta==0)
             {
-                printf("Carga exitosa.\n");
+               
+                printf("Carga fallida.\n");
             }
             else
             {
-                printf("Carga fallida.\n");
+                printf("Carga exitosa.\n");
             }
+
+            printf("Presione ENTER para continuar...");
+            getchar(); // <-- Este ahora sí esperará al usuario
 
             break;
         case 2:
@@ -80,9 +96,11 @@ void menuArbol(Arbol *arbol)
                 printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
                 scanf("%d", &dni);
             }
-            returnBaja = bajaABBConfirmada(dni, arbol);
+            getchar();
+            Prestador auxP = {dni, "", "", "", "", ""};
+            resultadoBaja = bajaABB(auxP, arbol,1,&costonull);
 
-            switch (returnBaja)
+            switch (resultadoBaja)
             {
             case 0:
                 printf("El prestador no existe en la lista.\n");
@@ -101,6 +119,13 @@ void menuArbol(Arbol *arbol)
                 printf("Error inesperado\n");
                 break;
             }
+            printf("Presione ENTER para continuar...\n");
+            char enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
+
             break;
         case 3:
             limpiarPantalla();
@@ -113,8 +138,9 @@ void menuArbol(Arbol *arbol)
                 printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
                 scanf("%d", &dni);
             }
-            float costoEvocar = 0.0;
-            aux = evocarABB(arbol, dni, &costoEvocar);
+            getchar();
+            
+            aux = evocarABB(arbol, dni, &costonull);
             if (aux.dni == 0)
             {
                 printf("El prestador no existe en la lista.\n");
@@ -124,7 +150,12 @@ void menuArbol(Arbol *arbol)
                 printf("El prestador fue encontrado exitosamente.\n");
                 mostrarPrestador(aux);
             }
-            getchar();
+            printf("Presione ENTER para continuar...\n");
+            enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
             break;
         case 4:
             limpiarPantalla();
@@ -132,17 +163,20 @@ void menuArbol(Arbol *arbol)
             printf("Usted selecciono: MOSTRAR ESTRUCTURA  \n\n");
             mostrarEstructuraABB(arbol->raiz);
             getchar();
+            printf("Presione ENTER para continuar...\n");
+            getchar();
             break;
         case 5:
             limpiarPantalla();
-
             printf("Usted selecciono: CARGAR DESDE ARCHIVO (Memorizacion Previa) \n\n");
-            resultMem = memorizacionPreviaABB(arbol);
-            switch (resultMem)
+            resultadoMem = memorizacionPreviaABB(arbol);
+            getchar();
+            switch (resultadoMem)
             {
             case 1:
                 printf("Memorizacion exitosa.\n");
 
+                break;
             case 2:
                 printf("El archivo está vacío.\n");
                 break;
@@ -152,6 +186,12 @@ void menuArbol(Arbol *arbol)
             default:
                 printf("Error inesperado en carga de archivo.\n");
                 break;
+            }
+            printf("Presione ENTER para continuar...\n");
+            enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
             }
             break;
         case 6:
@@ -165,11 +205,20 @@ void menuArbol(Arbol *arbol)
                 printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
                 scanf("%d", &dni);
             }
+            getchar();
 
             modificarABB(dni, arbol);
+            printf("Presione ENTER para continuar...\n");
+            enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
+
 
             break;
         case 7:
+        limpiarPantalla();
             printf("Volviendo...\n");
             break;
         default:
@@ -234,6 +283,7 @@ void menuListaVinculada(LVO *lvo)
             printf("Ingrese el teléfono:\n");
             fgets(aux.telefono, sizeof(aux.telefono), stdin);
             aux.telefono[strcspn(aux.telefono, "\n")] = 0;
+            
             resultadoAlta = altaLVO(aux, lvo, &costonull);
 
             switch (resultadoAlta)
@@ -602,7 +652,7 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
     float costoOperacion = 0.0;
     Prestador aux, aux2;
 
-    FILE *fp = fopen("Operaciones-Prestadores.txt", "r");
+    FILE *fp = fopen("Operaciones-Prestadores2.txt", "r");
     if (fp == NULL)
         return 3; // Archivo no encontrado
 
@@ -671,7 +721,7 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
         case 2: // BAJA
             // ABB
             costoOperacion = 0.0;
-            result = bajaABBAutomatica(arbol, aux, &costoOperacion);
+            result = bajaABB(aux, arbol, 0, &costoOperacion);
             if (result == 1)
             {
                 costosGlobales->abb.totalBaja += costoOperacion;
@@ -708,20 +758,19 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
             // ABB
             costoOperacion = 0.0;
             aux2 = evocarABB(arbol, aux.dni, &costoOperacion);
-            if (aux2.dni != 0)
-            {
-                costosGlobales->abb.totalEvocacionExitosa += costoOperacion;
-                costosGlobales->abb.cantEvocacionExitosa++;
-                if (costoOperacion > costosGlobales->abb.maxEvocacionExitosa)
-                    costosGlobales->abb.maxEvocacionExitosa = costoOperacion;
-              }
-            else
+            if (aux2.dni == 0)
             {
                 costosGlobales->abb.totalEvocacionFallida += costoOperacion;
                 costosGlobales->abb.cantEvocacionFallida++;
                 if (costoOperacion > costosGlobales->abb.maxEvocacionFallida)
                     costosGlobales->abb.maxEvocacionFallida = costoOperacion;
-           
+            }
+            else
+            {
+                    costosGlobales->abb.totalEvocacionExitosa += costoOperacion;
+                    costosGlobales->abb.cantEvocacionExitosa++;
+                    if (costoOperacion > costosGlobales->abb.maxEvocacionExitosa)
+                        costosGlobales->abb.maxEvocacionExitosa = costoOperacion;
             }
 
             // LIBB

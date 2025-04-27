@@ -41,20 +41,20 @@ void mostrarCostos(const char* nombre, CostosEstructura c) {
 
     printf("Máximo de alta exitosa: %.2f\n", c.maxAlta);
     printf("Promedio de alta exitosa: %.2f\n\n", c.medAlta);
-    printf("Total de alta exitosa: %.2f\n\n", c.totalAlta);
-    printf("Cantidad de altas exitosas: %d\n\n", c.cantAlta);
+   //printf("Total de alta exitosa: %.2f\n\n", c.totalAlta);
+    //printf("Cantidad de altas exitosas: %d\n\n", c.cantAlta);
 
     printf("Máximo de baja exitosa: %.2f\n", c.maxBaja);
     printf("Promedio de baja exitosa: %.2f\n\n", c.medBaja);
-    printf("Total de baja exitosa: %.2f\n\n", c.totalBaja);
+    //printf("Total de baja exitosa: %.2f\n\n", c.totalBaja);
 
     printf("Máximo de evocación exitosa: %.2f\n", c.maxEvocacionExitosa);
     printf("Promedio de evocación exitosa: %.2f\n\n", c.medEvocacionExitosa);
-    printf("Total de evocación exitosa: %.2f\n\n", c.totalEvocacionExitosa);
+    //printf("Total de evocación exitosa: %.2f\n\n", c.totalEvocacionExitosa);
 
     printf("Máximo de evocación NO exitosa: %.2f\n", c.maxEvocacionFallida);
     printf("Promedio de evocación NO exitosa: %.2f\n\n", c.medEvocacionFallida);
-    printf("Total de evocación NO exitosa: %.2f\n\n", c.totalEvocacionFallida);
+    //printf("Total de evocación NO exitosa: %.2f\n\n", c.totalEvocacionFallida);
 }
 
 void mostrarCostosGlobales(CostosGlobales costos) {
