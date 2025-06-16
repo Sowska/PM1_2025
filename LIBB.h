@@ -1,13 +1,11 @@
-//Trabajo de Maquina 1
-//Grupo 3 - Becerra Octavio, Losowski Sofia
-
 #ifndef LIBB_H
 #define LIBB_H
 #include "Prestador.h"
 #include "Resultloc.h"
 
-typedef struct {
-    Prestador* prestadores[MAX];
+typedef struct
+{
+    Prestador *prestadores[MAX];
     int ultimo;
 } LIBB;
 
@@ -17,40 +15,51 @@ resultLoc localizarLIBB(LIBB lista, int dni, float *costo)
     (*costo) = 0.0;
     int li = 0, ls = lista.ultimo, t;
     loc.exito = 0;
+
     if (lista.ultimo == -1)
     {
         loc.lugar = 0;
         return loc;
     }
+
     int controlTestigo[lista.ultimo + 1];
-    for (int i = 0; i < lista.ultimo; i++)
+    for (int i = 0; i <= lista.ultimo; i++)
     {
         controlTestigo[i] = 0;
     }
+
     while (li < ls)
     {
-        t = li + (ls - li + 1) / 2;
+        t = (li + (ls + 1)) / 2;
         if (lista.prestadores[t]->dni <= dni)
         {
             li = t;
-            controlTestigo[t] = 1;
+            if (controlTestigo[t] == 0)
+            {
+                (*costo) += 2;
+                controlTestigo[t] = 1;
+            }
         }
         else
         {
             ls = t - 1;
+            (*costo) += 2;
         }
-        (*costo) += 1;
     }
+
+    if (controlTestigo[li] == 0)
+    {
+        (*costo) += 2;
+        controlTestigo[li] = 1;
+    }
+
     if (lista.prestadores[li]->dni == dni)
     {
-        if (controlTestigo[li] == 0)
-        {
-            (*costo)++;
-        }
         loc.exito = 1;
         loc.lugar = li;
         return loc;
     }
+
     loc.lugar = (lista.prestadores[li]->dni < dni) ? li + 1 : li;
     return loc;
 }
@@ -73,7 +82,7 @@ int altaLIBB(Prestador prestador, LIBB *lista, float *costo)
     {
         return 3; // Memoria insuficiente
     }
-    *newprestador = prestador; // Desplazamos elementos a la derecha para hacer espacio
+    *newprestador = prestador;
 
     for (int i = lista->ultimo; i >= aux.lugar; i--)
     {
@@ -85,58 +94,89 @@ int altaLIBB(Prestador prestador, LIBB *lista, float *costo)
     return 1;
 }
 
-int bajaLIBBAutomatica(int dni, LIBB *lista, float *costo)
+int bajaLIBB(Prestador prestador, LIBB *libb, float *costo, int flag)
 {
     (*costo) = 0.0;
-    float costonull = 0;
-    if (lista->ultimo == -1)
+    float costoloc = 0;
+    int opcion = 0;
+
+    if (libb->ultimo == -1)
     {
         return 2; // Lista vacía
     }
 
-    resultLoc aux = localizarLIBB(*lista, dni, &costonull);
+    resultLoc aux = localizarLIBB(*libb, prestador.dni, &costoloc);
     if (!aux.exito)
     {
         return 0; // El elemento no existe
     }
 
-    free(lista->prestadores[aux.lugar]);
-    lista->prestadores[aux.lugar] = NULL;
-
-    for (int i = aux.lugar; i < lista->ultimo; i++)
+    if (flag == 1) // baja con confirmacion
     {
-        lista->prestadores[i] = lista->prestadores[i + 1];
-        (*costo) += 0.5;
-    }
-    lista->ultimo--;
+        do
+        {
+            printf("El prestador encontrado es:\n");
+            mostrarPrestador(*libb->prestadores[aux.lugar]);
+            printf("¿Desea eliminarlo? (1: Si, 2: No): ");
+            scanf("%d", &opcion);
+            getchar();
+        } while (opcion != 1 && opcion != 2);
 
-    return 1; // Baja exitosa
+          if (opcion != 1)
+            return 3; // Baja cancelada
+    } else    {
+        if (sonDiferentes(*libb->prestadores[aux.lugar], prestador))
+            return 3; // Prestador diferente
+    }
+    
+    free(libb->prestadores[aux.lugar]);
+    libb->prestadores[aux.lugar] = NULL;
+
+    for (int i = aux.lugar; i < libb->ultimo; i++) {
+        libb->prestadores[i] = libb->prestadores[i + 1];
+        *costo += 0.5;
+    }
+
+    libb->ultimo--;
+
+    return 1;
 }
 
-int modificarLIBB(int dni, LIBB *lista)
+void modificarLIBB(int dni, LIBB *lista)
 {
 
-    int modificaraux = 0;
+    int opmod = 0;
 
-    float costonull = 0;
+    float costoDespreciado = 0;
 
     if (lista->ultimo == -1)
     {
-        return 2; // Lista vacia
+        printf("Lista vacia\n");
+        return;
     }
 
-    resultLoc aux = localizarLIBB(*lista, dni, &costonull);
+    resultLoc aux = localizarLIBB(*lista, dni, &costoDespreciado);
 
     if (!aux.exito)
     {
-        return 0; // El elemento no existe
+        printf("El prestador no existe en la lista.\n");
+        return;
     }
 
-    printf("\n Que campo del prestador usted desea modificar?\n\n");
-    printf("1-Nombre\n2-Servicio\n3-Domicilio\n4-Email\n5-Telefono\n");
-    printf("Si desea modificar todos los campos ingrese 6\n");
-    scanf("%d", &modificaraux);
-    switch (modificaraux)
+    printf("El prestador encontrado es:\n");
+    mostrarPrestador(*lista->prestadores[aux.lugar]);
+
+    do
+    {
+        printf("\n Que campo del prestador usted desea modificar?\n\n");
+        printf("1-Nombre\n2-Servicio\n3-Domicilio\n4-Email\n5-Telefono\n");
+        printf("Si desea modificar todos los campos, ingrese 6 \n");
+        printf("Para cancelar la operación, presione 7 \n");
+        scanf("%d", &opmod);
+    } while (opmod < 0 || opmod > 7);
+    getchar();
+
+    switch (opmod)
     {
 
     case 1:
@@ -144,26 +184,32 @@ int modificarLIBB(int dni, LIBB *lista)
         printf("Usted selecciono: MODIFICAR NOMBRE\n\n");
 
         modificar_nombre(lista->prestadores[aux.lugar]);
+        printf("¡Modificacion exitosa!\n\n");
         break;
     case 2:
 
         printf("Usted selecciono: MODIFICAR SERVICIO\n\n");
         modificar_servicio(lista->prestadores[aux.lugar]);
+        printf("¡Modificacion exitosa!\n\n");
         break;
     case 3:
 
         printf("Usted selecciono: MODIFICAR DOMICILIO\n\n");
         modificar_domicilio(lista->prestadores[aux.lugar]);
+        printf("¡Modificacion exitosa!\n\n");
         break;
     case 4:
 
         printf("Usted selecciono: MODIFICAR EMAIL\n\n");
         modificar_email(lista->prestadores[aux.lugar]);
+        printf("¡Modificacion exitosa!\n\n");
         break;
     case 5:
 
         printf("Usted selecciono: MODIFICAR TELEFONO\n\n");
         modificar_telefono(lista->prestadores[aux.lugar]);
+        printf("¡Modificacion exitosa!\n\n");
+        break;
     case 6:
 
         printf("Usted selecciono: MODIFICAR TODOS LOS CAMPOS\n\n");
@@ -177,18 +223,24 @@ int modificarLIBB(int dni, LIBB *lista)
         printf("¡Modificacion exitosa!\n\n");
 
         break;
-    }
 
-    return 1;
+    case 7:
+        printf("Operación cancelada.\n");
+        break;
+
+    default:
+        printf("Error inesperado\n");
+
+        break;
+    }
 }
 
 Prestador evocarLIBB(LIBB lista, int dni, float *costo)
 {
-    (*costo) = 0.0;
-    float costonull = 0;
+    (*costo) = 0;
 
     Prestador prestador;
-    resultLoc aux = localizarLIBB(lista, dni, &costonull);
+    resultLoc aux = localizarLIBB(lista, dni, costo);
     if (aux.exito)
     {
         prestador = *lista.prestadores[aux.lugar];
@@ -197,167 +249,112 @@ Prestador evocarLIBB(LIBB lista, int dni, float *costo)
     {
         prestador = (Prestador){0, "", "", "", "", ""};
     }
-    (*costo) = costonull;
     return prestador;
 }
 
-int bajaLIBBConfirmada(int dni, LIBB *lista, float *costo)
+void mostrarLIBBPaginada(LIBB lista, int pagina, int elementosPorPagina)
 {
-    (*costo) = 0;
-    float costonull = 0;
-    int opcion, retorno;
-    if (lista->ultimo == -1)
+    if (lista.ultimo == -1)
     {
-
-        return 2; // lista vacia
+        printf("Lista vacia\n");
+        return;
     }
 
-    resultLoc aux = localizarLIBB(*lista, dni, &costonull);
-    if (!aux.exito)
-    {
+    int inicio = (pagina - 1) * elementosPorPagina;
+    int fin = inicio + elementosPorPagina <= lista.ultimo + 1 ? inicio + elementosPorPagina : lista.ultimo + 1;
 
-        return 0; // El elemento no existe
+    printf("\nPRESTADORES EN SISTEMA \n");
+    for (int i = inicio; i < fin; i++)
+    {
+        printf("\nDNI: %d\n Nombre: %s\n Servicios: %s\n Domicilio: %s\n Email: %s\n Telefono: %s\n\n*---------------------*\n\n",
+               lista.prestadores[i]->dni,
+               lista.prestadores[i]->nombre,
+               lista.prestadores[i]->servicios,
+               lista.prestadores[i]->domicilio,
+               lista.prestadores[i]->email,
+               lista.prestadores[i]->telefono);
     }
-
-    do
+    if (fin == lista.ultimo)
     {
-        printf("El prestador encontrado es:\n");
-        mostrarPrestador(*lista->prestadores[aux.lugar]);
-        printf("¿Desea eliminarlo? (1: Si, 2: No): ");
-        scanf("%d", &opcion);
-    } while (opcion != 1 && opcion != 2);
-
-    switch (opcion)
-    {
-    case 1:
-
-        free(lista->prestadores[aux.lugar]);
-        lista->prestadores[aux.lugar] = NULL;
-
-        for (int i = aux.lugar; i < lista->ultimo; i++)
-        {
-            lista->prestadores[i] = lista->prestadores[i + 1];
-            (*costo) += 0.5;
-        }
-        lista->ultimo--;
-        retorno = 1; // Baja exitosa
-
-        break;
-
-    case 2:
-        retorno = 3; // Baja cancelada
-        break;
-
-    default:
-    retorno = 4;
-        break;
+        printf("Fin de la lista\n");
     }
-    return retorno;
+    else
+    {
+        printf("Pagina %d de %d\n\n", pagina, (lista.ultimo / elementosPorPagina) + 1);
+    }
 }
 
-    void mostrarLIBBPaginada(LIBB lista, int pagina, int elementosPorPagina)
+void initLIBB(LIBB *lista)
+{
+    lista->ultimo = -1;
+    for (int i = 0; i < MAX; i++)
     {
-        if (lista.ultimo == -1)
-        {
-            printf("Lista vacia\n");
-            return;
-        }
+        lista->prestadores[i] = NULL;
+    }
+}
+void liberarLIBB(LIBB *lista)
+{
+    for (int i = 0; i <= lista->ultimo; i++)
+    {
+        free(lista->prestadores[i]);
+    }
+    lista->ultimo = -1;
+}
 
-        int inicio = (pagina - 1) * elementosPorPagina;
-        int fin = inicio + elementosPorPagina <= lista.ultimo + 1 ? inicio + elementosPorPagina : lista.ultimo + 1;
+int memorizacionPreviaLIBB(LIBB *lista)
+{
 
-        printf("\nPRESTADORES EN SISTEMA \n");
-        for (int i = inicio; i < fin; i++)
-        {
-            printf("\nDNI: %d\n Nombre: %s\n Servicios: %s\n Domicilio: %s\n Email: %s\n Telefono: %s\n\n*---------------------*\n\n",
-                   lista.prestadores[i]->dni,
-                   lista.prestadores[i]->nombre,
-                   lista.prestadores[i]->servicios,
-                   lista.prestadores[i]->domicilio,
-                   lista.prestadores[i]->email,
-                   lista.prestadores[i]->telefono);
-        }
-        if (fin == lista.ultimo)
-        {
-            printf("Fin de la lista\n");
-        }
-        else
-        {
-            printf("Pagina %d de %d\n\n", pagina, (lista.ultimo / elementosPorPagina) + 1);
-        }
+    FILE *fp;
+    Prestador aux;
+    int returnAlta;
+    int auxDNI = 0;
+    float costoDespreciado = 0.0;
+
+    if ((fp = fopen("Prestadores.txt", "r")) == NULL)
+    {
+        return 0;
     }
 
-    void initLIBB(LIBB * lista)
+    fseek(fp, 0, SEEK_END); //(fichero, desplazamiento, origen) , SEEK_END el desplazamiento se cuenta desde el final del archivo
+    if (ftell(fp) == 0)     // indica la posicion actual en un archivo
     {
-        lista->ultimo = -1;
-        for (int i = 0; i < MAX; i++)
-        {
-            lista->prestadores[i] = NULL;
-        }   
-    }
-    void liberarLIBB(LIBB * lista)
-    {
-        for (int i = 0; i <= lista->ultimo; i++)
-        {
-            free(lista->prestadores[i]);
-        }
-        lista->ultimo = -1;
+        return 2;
     }
 
-    int memorizacionPreviaLIBB(LIBB * lista)
+    rewind(fp);
+
+    while (lista->ultimo < MAX - 1 && !(feof(fp)))
     {
+        fscanf(fp, "%d\n", &auxDNI);
 
-        FILE *fp;
-        Prestador aux;
-        int returnAlta;
-        int auxdni = 0;
-        float costoDespreciado = 0.0;
-        if ((fp = fopen("Prestadores.txt", "r")) == NULL)
+        if (auxDNI < MINDNI || auxDNI > INFINITO)
         {
-            return 3;
-        }
-
-        fseek(fp, 0, SEEK_END); //(fichero, desplazamiento, origen) , SEEK_END el desplazamiento se cuenta desde el final del archivo
-        if (ftell(fp) == 0)     // indica la posicion actual en un archivo
-        {
-            return 2;
-        }
-
-        rewind(fp);
-
-        while (lista->ultimo < MAX - 1 && !(feof(fp)))
-        {
-            fscanf(fp, "%d\n", &auxdni);
-
-            if (auxdni < 10000000 || auxdni > INFINITO)
+            for (int i = 0; i < 5; i++)
             {
-                for (int i = 0; i < 5; i++)
+                fscanf(fp, "%*[^\n]\n");
+                if (feof(fp))
                 {
-                    fscanf(fp, "%*[^\n]\n");
-                    if (feof(fp))
-                    {
-                        break; // Salir del bucle si llegamos al final del archivo
-                    }
-                }
-            }
-
-            else
-            {
-                aux.dni = auxdni;
-                fscanf(fp, "%[^\n]\n", aux.nombre);
-                fscanf(fp, "%[^\n]\n", aux.servicios);
-                fscanf(fp, "%[^\n]\n", aux.domicilio);
-                fscanf(fp, "%[^\n]\n", aux.email);
-                fscanf(fp, "%[^\n]\n", aux.telefono);
-                returnAlta = altaLIBB(aux, lista, &costoDespreciado);
-                if (!returnAlta)
-                {
-                    printf("Ya existe un prestador asociado al dni %d en la estructura.\n", aux.dni);
+                    break; // Salir del bucle si llegamos al final del archivo
                 }
             }
         }
-        fclose(fp);
-        return (lista->ultimo == MAX - 1) ? 4 : 1;
+        aux.dni = auxDNI;
+        fscanf(fp, "%[^\n]\n", aux.nombre);
+        fscanf(fp, "%[^\n]\n", aux.servicios);
+        fscanf(fp, "%[^\n]\n", aux.domicilio);
+        fscanf(fp, "%[^\n]\n", aux.email);
+        fscanf(fp, "%[^\n]\n", aux.telefono);
+
+        returnAlta = altaLIBB(aux, lista, &costoDespreciado);
+
+        if (returnAlta == 0)
+
+        {
+            printf("Ya existe un prestador asociado al dni %d en la estructura.\n", aux.dni);
+        }
     }
+    fclose(fp);
+    return (lista->ultimo == MAX - 1) ? 4 : 1;
+}
 
 #endif // LIBB_H

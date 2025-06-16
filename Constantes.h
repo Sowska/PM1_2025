@@ -1,10 +1,9 @@
 #ifndef CONSTANTES_H
 #define CONSTANTES_H
 
-#define MAX 20
+#define MAX 110
 #define MINDNI 10
 #define INFINITO 99
-
 void limpiarPantalla()
 {
 #ifdef _WIN32

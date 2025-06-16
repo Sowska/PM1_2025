@@ -3,7 +3,6 @@
 #include "Prestador.h"
 #include "NodoPila.h"
 
-
 typedef struct
 {
     NodoArbol *raiz;
@@ -17,19 +16,6 @@ typedef struct Nodo
     struct Nodo *izq;
     struct Nodo *der;
 } Nodo;
-
-NodoArbol *crearNodo(Prestador prestador)
-{
-    NodoArbol *nuevo = (NodoArbol *)malloc(sizeof(NodoArbol));
-    if (nuevo != NULL)
-    {
-        nuevo->prestador = prestador;
-        nuevo->izq = NULL;
-        nuevo->der = NULL;
-    }
-
-    return nuevo;
-}
 
 void freeNodo(NodoArbol *nodo)
 {
@@ -70,7 +56,6 @@ int localizarABB(Arbol *arbol, int dni, float *costo)
     while (arbol->pos != NULL && dni != arbol->pos->prestador.dni)
     {
         (*costo)++;
-        
 
         if (arbol->pos->prestador.dni < dni)
         {
@@ -82,7 +67,6 @@ int localizarABB(Arbol *arbol, int dni, float *costo)
             arbol->padre = arbol->pos;
             arbol->pos = arbol->pos->izq;
         }
-        
     }
 
     if (arbol->pos != NULL)
@@ -102,22 +86,26 @@ int altaABB(Arbol *arbol, Prestador x, float *costo)
     }
     else
     {
-        NodoArbol *nuevoNodo = crearNodo(x);
+        NodoArbol *nuevo = (NodoArbol *)malloc(sizeof(NodoArbol));
+        if (nuevo == NULL)
+        {
+            return 2; // Memoria insuficiente
+        }
         if (arbol->raiz == NULL)
         {
-            arbol->raiz = nuevoNodo;
-            arbol->padre = nuevoNodo;
+            arbol->raiz = nuevo;
+            arbol->padre = nuevo;
             *costo += .5;
         }
         else
         {
             if (x.dni > arbol->padre->prestador.dni)
             {
-                arbol->padre->der = nuevoNodo;
+                arbol->padre->der = nuevo;
             }
             else
             {
-                arbol->padre->izq = nuevoNodo;
+                arbol->padre->izq = nuevo;
             }
             *costo += 0.5;
         }
@@ -133,7 +121,7 @@ int bajaABB(Prestador prestador, Arbol *arbol, int flag, float *costo)
     int opcion = 0;
 
     if (arbol->raiz == NULL)
-        return 2; // Árbol vacío
+        return 2;
 
     if (!localizarABB(arbol, prestador.dni, &costoloc))
         return 0; // Elemento no existe
@@ -152,158 +140,80 @@ int bajaABB(Prestador prestador, Arbol *arbol, int flag, float *costo)
             getchar(); // limpiar buffer
         } while (opcion != 1 && opcion != 2);
 
-        switch (opcion)
-        {
-        case 1:
-            // Nodo hoja
-            if (arbol->pos->der == NULL && arbol->pos->izq == NULL)
-            {
-                if (arbol->pos == arbol->raiz)
-                {
-                    arbol->raiz = NULL;
-                }
-                else if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
-                {
-                    arbol->padre->izq = NULL;
-                }
-                else
-                {
-                    arbol->padre->der = NULL;
-                }
-                *costo += 0.5;
-                free(arbol->pos);
-                arbol->pos = NULL;
-                return 1;
-            }
-            // Nodo con un hijo
-            else if (arbol->pos->der == NULL || arbol->pos->izq == NULL)
-            {
-                auxi = (arbol->pos->izq != NULL) ? arbol->pos->izq : arbol->pos->der;
-                if (arbol->pos == arbol->raiz)
-                {
-                    arbol->raiz = auxi;
-                }
-                else if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
-                {
-                    arbol->padre->izq = auxi;
-                }
-                else
-                {
-                    arbol->padre->der = auxi;
-                }
-                *costo += 0.5;
-                free(arbol->pos);
-                arbol->pos = NULL;
-                return 1;
-            }
-            // Nodo con dos hijos
-            else
-            {
-                elem = arbol->pos->der;
-                arbol->padre = arbol->pos;
-                NodoArbol *ant_aux = NULL;
-                while (elem->izq != NULL)
-                {
-                    ant_aux = elem;
-                    elem = elem->izq;
-                }
-                arbol->pos->prestador = elem->prestador;
-                *costo += 1.0;
-                if (ant_aux == NULL)
-                {
-                    arbol->pos->der = elem->der;
-                }
-                else
-                {
-                    ant_aux->izq = elem->der;
-                }
-                *costo += 0.5;
-                free(elem);
-                elem = NULL;
-                return 1;
-            }
-            break;
-
-        case 2:
-            return 3; // Cancelado por el usuario
-            break;
-        }
+        if (opcion == 2)
+            return 3; // Baja cancelada por el usuario
     }
-    else // Baja sin confirmacion
+    else
     {
         if (sonDiferentes(arbol->pos->prestador, prestador))
-        {
             return 3; // Prestador diferente
-        }
+    }
 
-        // Nodo hoja
-        if (arbol->pos->der == NULL && arbol->pos->izq == NULL)
+    // Nodo hoja
+    if (arbol->pos->der == NULL && arbol->pos->izq == NULL)
+    {
+        if (arbol->pos == arbol->raiz)
         {
-            if (arbol->pos == arbol->raiz)
-            {
-                arbol->raiz = NULL;
-            }
-            else if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
-            {
-                arbol->padre->izq = NULL;
-            }
-            else
-            {
-                arbol->padre->der = NULL;
-            }
-            *costo += 0.5;
-            free(arbol->pos);
-            arbol->pos = NULL;
-            return 1;
+            arbol->raiz = NULL;
         }
-        // Nodo con un hijo
-        else if (arbol->pos->der == NULL || arbol->pos->izq == NULL)
+        else if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
         {
-            auxi = (arbol->pos->izq != NULL) ? arbol->pos->izq : arbol->pos->der;
-            if (arbol->pos == arbol->raiz)
-            {
-                arbol->raiz = auxi;
-            }
-            else if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
-            {
-                arbol->padre->izq = auxi;
-            }
-            else
-            {
-                arbol->padre->der = auxi;
-            }
-            *costo += 0.5;
-            free(arbol->pos);
-            arbol->pos = NULL;
-            return 1;
+            arbol->padre->izq = NULL;
         }
-        // Nodo con dos hijos
         else
         {
-            elem = arbol->pos->der;
-            arbol->padre = arbol->pos;
-            NodoArbol *ant_aux = NULL;
-            while (elem->izq != NULL)
-            {
-                ant_aux = elem;
-                elem = elem->izq;
-            }
-            arbol->pos->prestador = elem->prestador;
-            *costo += 1.0;
-            if (ant_aux == NULL)
-            {
-                arbol->pos->der = elem->der;
-            }
-            else
-            {
-                ant_aux->izq = elem->der;
-            }
-            *costo += 0.5;
-            free(elem);
-            elem = NULL;
-            return 1;
+            arbol->padre->der = NULL;
         }
+        *costo += 0.5;
+        free(arbol->pos);
+        arbol->pos = NULL;
+        return 1;
     }
+    // Nodo con un hijo
+    if (arbol->pos->der == NULL || arbol->pos->izq == NULL)
+    {
+        auxi = (arbol->pos->izq != NULL) ? arbol->pos->izq : arbol->pos->der;
+        if (arbol->pos == arbol->raiz)
+        {
+            arbol->raiz = auxi;
+        }
+        else if (arbol->pos->prestador.dni < arbol->padre->prestador.dni)
+        {
+            arbol->padre->izq = auxi;
+        }
+        else
+        {
+            arbol->padre->der = auxi;
+        }
+        *costo += 0.5;
+        free(arbol->pos);
+        arbol->pos = NULL;
+        return 1;
+    }
+    // Nodo con dos hijos
+
+    elem = arbol->pos->der;
+    arbol->padre = arbol->pos;
+    NodoArbol *ant_aux = NULL;
+    while (elem->izq != NULL)
+    {
+        ant_aux = elem;
+        elem = elem->izq;
+    }
+    arbol->pos->prestador = elem->prestador;
+    *costo += 1.0;
+    if (ant_aux == NULL)
+    {
+        arbol->pos->der = elem->der;
+    }
+    else
+    {
+        ant_aux->izq = elem->der;
+    }
+    *costo += 0.5;
+    free(elem);
+    elem = NULL;
+    return 1;
 }
 
 Prestador evocarABB(Arbol *arbol, int x, float *costo)
@@ -386,7 +296,6 @@ void mostrarEstructuraABB(NodoArbol *raiz)
     printf("\n** FIN DEL ÁRBOL **\n");
 }
 
-
 void initArbol(Arbol *arbol)
 {
     arbol->raiz = NULL;
@@ -468,7 +377,7 @@ void modificarABB(int dni, Arbol *arbol)
             printf("Para regresar, ingrese 7 \n");
             scanf("%d", &opmod);
         } while (opmod < 0 || opmod > 7);
-getchar();
+        getchar();
         switch (opmod)
         {
         case 1:
@@ -516,8 +425,8 @@ getchar();
             break;
 
         case 7:
-        printf("Volviendo...\n");
-        break;
+            printf("Volviendo...\n");
+            break;
 
         default:
             printf("Error inesperado\n");

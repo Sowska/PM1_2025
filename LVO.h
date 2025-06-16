@@ -55,7 +55,8 @@ resultLocLVO localizarLVO(LVO lista, int dni, float *costo)
 
     loc.pos = actual;
     loc.pre = anterior;
-    if (loc.exito) {
+    if (actual != NULL)
+    {
         (*costo)++;
     }
 
@@ -124,61 +125,35 @@ int bajaLVO(Prestador prestador, LVO *lista, float *costo, int flag)
 
     if (flag == 1)
     { // el flag activado indica baja con confirmacion
+        printf("El prestador encontrado es:\n");
+        mostrarPrestador(aux.pos->prestador);
         do
         {
-            printf("El prestador encontrado es:\n");
-            mostrarPrestador(aux.pos->prestador);
             printf("¿Desea eliminarlo? (1: Si, 2: No): ");
             scanf("%d", &opcion);
             getchar();
         } while (opcion != 1 && opcion != 2);
 
-        switch (opcion)
-        {
-        case 1:
-
-            if (aux.pre == NULL)
-            { // El nodo a eliminar es el primero
-                lista->head = aux.pos->siguiente;
-            }
-            else
-            {
-                aux.pre->siguiente = aux.pos->siguiente; // el anterior ahora salta al siguiente del nodo que quiero borrar
-            }
-            (*costo) += 0.5;
-            free(aux.pos); // Libero la memoria del nodo eliminado
-            lista->size--;
-            break;
-
-        case 2:
-        return 3; // Baja cancelada
-            break;
-
-        }
-
-        return 1;
+        if (opcion == 2)
+            return 3; // Baja cancelada por el usuario
     }
     else
     {
         if (sonDiferentes(aux.pos->prestador, prestador))
-        {
             return 3; // El prestador a eliminar es diferente al que se busca
-        }
-
-        if (aux.pre == NULL)
-        { // El nodo a eliminar es el primero
-            lista->head = aux.pos->siguiente;
-        }
-        else
-        {
-            aux.pre->siguiente = aux.pos->siguiente; // el anterior ahora salta al siguiente del nodo que quiero borrar
-        }
-        free(aux.pos);
-        (*costo) += .5;
-        lista->size--;
-
-        return 1; // Baja exitosa
     }
+
+    if (aux.pre == NULL)
+        // El nodo a eliminar es el primero
+        lista->head = aux.pos->siguiente;
+    else
+        aux.pre->siguiente = aux.pos->siguiente; // el anterior ahora salta al siguiente del nodo que quiero borrar
+
+    free(aux.pos);
+    (*costo) += .5;
+    lista->size--;
+
+    return 1; // Baja exitosa
 }
 
 void modificarLVO(int dni, LVO *lista)
@@ -199,7 +174,7 @@ void modificarLVO(int dni, LVO *lista)
             printf("Para cancelar la operación, presione 7 \n");
             scanf("%d", &opmod);
         } while (opmod < 0 || opmod > 7);
-getchar();
+        getchar();
         switch (opmod)
         {
         case 1:
@@ -246,7 +221,7 @@ getchar();
             scanf(" %[^\n]", resultado.pos->prestador.telefono);
             getchar();
             printf("Modificación exitosa.\n");
-            
+
             break;
 
         case 7:
@@ -358,7 +333,7 @@ int memorizacionPrevia(LVO *lista)
 
         returnAlta = altaLVO(aux, lista, &costoDespreciado);
 
-        if (returnAlta==0)
+        if (returnAlta == 0)
         {
             printf("Ya existe un prestador asociado al dni %d en la estructura.\n", aux.dni);
         }

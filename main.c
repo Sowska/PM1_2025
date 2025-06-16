@@ -1,3 +1,51 @@
+// Grupo 4 - Becerra Octavio, Losowski Sofia
+
+/*En LVO las altas y bajas son mas eficientes, pero las evocaciones son mas costosas. Esto sugiere que la LVO es menos eficiente en 
+cuanto a busqueda, especialmente en listas grandes. En cambio, la LIBB es mas eficiente en busqueda, pero menos eficiente en altas y bajas.
+ABB en cambio es una buena opcion que equilibria ambas cosas, pero no es la mejor en ninguna de las dos.
+El ABB es el que mejor eficiencia tiene en altas y bajas, mantiendo un costo bajo en evocaciones.
+
+--------LVO-------- 
+ Máximo de alta exitosa: 1.00
+Promedio de alta exitosa: 1.00
+
+Máximo de baja exitosa: 0.50
+Promedio de baja exitosa: 0.50
+
+Máximo de evocación exitosa: 106.00
+Promedio de evocación exitosa: 38.13
+
+Máximo de evocación NO exitosa: 82.00
+Promedio de evocación NO exitosa: 30.78
+
+
+--------LIBB--------
+Máximo de alta exitosa: 53.50
+Promedio de alta exitosa: 13.36
+
+Máximo de baja exitosa: 48.00
+Promedio de baja exitosa: 14.80
+
+Máximo de evocación exitosa: 14.00
+Promedio de evocación exitosa: 12.46
+
+Máximo de evocación NO exitosa: 14.00
+Promedio de evocación NO exitosa: 11.52
+
+
+--------ABB--------
+Máximo de alta exitosa: 0.50
+Promedio de alta exitosa: 0.50
+
+Máximo de baja exitosa: 1.50
+Promedio de baja exitosa: 0.84
+
+Máximo de evocación exitosa: 12.00
+Promedio de evocación exitosa: 6.01
+
+Máximo de evocación NO exitosa: 10.00
+Promedio de evocación NO exitosa: 6.23 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -540,8 +588,10 @@ void menuListaInvertida(LIBB *libb)
                 printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
                 scanf("%d", &dni);
             }
-            float costoBaja = 0.0;
-            result = bajaLIBBConfirmada(dni, libb, &costoBaja);
+            getchar(); // Limpiar el buffer de entrada
+            Prestador auxP = {dni, "", "", "", "", ""};
+            float costoOcioso = 0.0;
+            result = bajaLIBB(auxP, libb, &costoOcioso, 1);
 
             switch (result)
             {
@@ -562,6 +612,13 @@ void menuListaInvertida(LIBB *libb)
                 printf("Error inesperado\n");
                 break;
             }
+
+            printf("Presione ENTER para continuar...\n");
+            char enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
             break;
 
         case 3:
@@ -576,6 +633,7 @@ void menuListaInvertida(LIBB *libb)
                 printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
                 scanf("%d", &dni);
             }
+            getchar();
             float costoEvocar = 0.0;
             aux = evocarLIBB(*libb, dni, &costoEvocar);
 
@@ -588,7 +646,12 @@ void menuListaInvertida(LIBB *libb)
                 printf("El prestador fue encontrado exitosamente.\n");
                 mostrarPrestador(aux);
             }
-            getchar();
+            printf("Presione ENTER para continuar...\n");
+            enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
             break;
         case 4:
             limpiarPantalla();
@@ -596,6 +659,13 @@ void menuListaInvertida(LIBB *libb)
             printf("Usted selecciono: MOSTRAR ESTRUCTURA  \n\n");
             mostrarLIBBPaginada(*libb, 1, (libb->ultimo) + 1);
             getchar();
+            printf("Presione ENTER para continuar...\n");
+            enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
+            
             break;
         case 5:
             limpiarPantalla();
@@ -606,6 +676,7 @@ void menuListaInvertida(LIBB *libb)
             {
             case 1:
                 printf("Memorizacion exitosa.\n");
+                break;
 
             case 2:
                 printf("El archivo está vacío.\n");
@@ -621,6 +692,13 @@ void menuListaInvertida(LIBB *libb)
                 printf("Error inesperado en carga de archivo.\n");
                 break;
             }
+            getchar();
+            printf("Presione ENTER para continuar...\n");
+            enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
             break;
         case 6:
             limpiarPantalla();
@@ -634,7 +712,15 @@ void menuListaInvertida(LIBB *libb)
                 printf("DNI invalido. Debe ser un numero positivo de 8 digitos.\n");
                 scanf("%d", &dni);
             }
-            modificarLIBB(dni, libb);
+            getchar();
+             modificarLIBB(dni, libb);
+
+            printf("Presione ENTER para continuar...\n");
+            enter = 0;
+            while (enter != '\r' && enter != '\n')
+            {
+                enter = getchar();
+            }
             break;
         case 7:
             printf("Volviendo...\n");
@@ -651,6 +737,7 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
     int operacion, result;
     float costoOperacion = 0.0;
     Prestador aux, aux2;
+    int cantidadPrestadoresABB = 0;
 
     FILE *fp = fopen("Operaciones-Prestadores2.txt", "r");
     if (fp == NULL)
@@ -687,24 +774,25 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
             result = altaABB(arbol, aux, &costoOperacion);
             if (result == 1)
             {
+                cantidadPrestadoresABB++;
                 costosGlobales->abb.totalAlta += costoOperacion;
                 costosGlobales->abb.cantAlta++;
                 if (costoOperacion > costosGlobales->abb.maxAlta)
                     costosGlobales->abb.maxAlta = costoOperacion;
             }
 
+
             // LIBB
             costoOperacion = 0.0;
             result = altaLIBB(aux, libb, &costoOperacion);
             if (result == 1) // Solo contar si fue exitosa (1)
             {
-
                 costosGlobales->libb.totalAlta += costoOperacion;
                 costosGlobales->libb.cantAlta++;
                 if (costoOperacion > costosGlobales->libb.maxAlta)
                     costosGlobales->libb.maxAlta = costoOperacion;
             }
-
+           
             // LVO
             costoOperacion = 0.0;
             result = altaLVO(aux, lvo, &costoOperacion);
@@ -714,8 +802,12 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
                 costosGlobales->lvo.cantAlta++;
                 if (costoOperacion > costosGlobales->lvo.maxAlta)
                     costosGlobales->lvo.maxAlta = costoOperacion;
-                lvo->size++;
             }
+
+            printf("Cantidad de prestadores por estructura:\n");
+            printf("LVO: %d\n", lvo->size);
+            printf("ABB: %d\n", cantidadPrestadoresABB);
+            printf("LIBB: %d\n", libb->ultimo + 1);
             break;
 
         case 2: // BAJA
@@ -724,6 +816,7 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
             result = bajaABB(aux, arbol, 0, &costoOperacion);
             if (result == 1)
             {
+                cantidadPrestadoresABB--;
                 costosGlobales->abb.totalBaja += costoOperacion;
                 costosGlobales->abb.cantBaja++;
                 if (costoOperacion > costosGlobales->abb.maxBaja)
@@ -732,7 +825,7 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
 
             // LIBB
             costoOperacion = 0.0;
-            result = bajaLIBBAutomatica(aux.dni, libb, &costoOperacion);
+            result = bajaLIBB(aux, libb, &costoOperacion, 0);
             if (result == 1) // Solo contar si fue exitosa (1)
             {
                 costosGlobales->libb.totalBaja += costoOperacion;
@@ -740,7 +833,7 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
                 if (costoOperacion > costosGlobales->libb.maxBaja)
                     costosGlobales->libb.maxBaja = costoOperacion;
             }
-
+           
             // LVO
             costoOperacion = 0.0;
             result = bajaLVO(aux, lvo, &costoOperacion, 0);
@@ -750,8 +843,12 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
                 costosGlobales->lvo.cantBaja++;
                 if (costoOperacion > costosGlobales->lvo.maxBaja)
                     costosGlobales->lvo.maxBaja = costoOperacion;
-                lvo->size--;
             }
+
+            printf("Cantidad de prestadores por estructura:\n");
+            printf("LVO: %d\n", lvo->size);
+            printf("ABB: %d\n", cantidadPrestadoresABB);
+            printf("LIBB: %d\n", libb->ultimo + 1);
             break;
 
         case 3: // EVOCACIOn
@@ -776,19 +873,20 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
             // LIBB
             costoOperacion = 0.0;
             aux2 = evocarLIBB(*libb, aux.dni, &costoOperacion);
-            if (aux2.dni != 0)
-            {
-                costosGlobales->libb.totalEvocacionExitosa += costoOperacion;
-                costosGlobales->libb.cantEvocacionExitosa++;
-                if (costoOperacion > costosGlobales->libb.maxEvocacionExitosa)
-                    costosGlobales->libb.maxEvocacionExitosa = costoOperacion;
-            }
-            else
-            {
+            if (aux2.dni ==0){
                 costosGlobales->libb.totalEvocacionFallida += costoOperacion;
                 costosGlobales->libb.cantEvocacionFallida++;
                 if (costoOperacion > costosGlobales->libb.maxEvocacionFallida)
                     costosGlobales->libb.maxEvocacionFallida = costoOperacion;
+                 
+            }
+            else
+            {
+                    costosGlobales->libb.totalEvocacionExitosa += costoOperacion;
+                    costosGlobales->libb.cantEvocacionExitosa++;
+                    if (costoOperacion > costosGlobales->libb.maxEvocacionExitosa)
+                        costosGlobales->libb.maxEvocacionExitosa = costoOperacion;
+                     
             }
 
             // LVO
@@ -820,8 +918,14 @@ int cargarArchivoOperaciones(Arbol *arbol, LVO *lvo, LIBB *libb, CostosGlobales 
 
     calculoPromediosCostos(costosGlobales);
 
+    printf("Total de prestadores por estructura:\n");
+    printf("LVO: %d\n", lvo->size);
+    printf("ABB: %d\n", cantidadPrestadoresABB);
+    printf("LIBB: %d\n", libb->ultimo + 1);
+
     return 1;
 }
+
 
 // Funcion para comparar estructuras
 void compararEstructuras(LIBB *libb, LVO *lvo, Arbol *arbol, CostosGlobales *costosGlobales)
